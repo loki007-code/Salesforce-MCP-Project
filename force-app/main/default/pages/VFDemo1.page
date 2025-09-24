@@ -1,0 +1,14 @@
+<apex:page showHeader="false" standardController="Account">
+    <apex:form >
+    	<table>
+            <tr>
+            	<td> Account Name </td>
+                <td> <apex:inputField value="{!Account.Name}"/> </td>
+            </tr>
+            <tr>
+            	<td> <apex:commandButton value="Save" action="{!save}"/> </td>
+                <td> <apex:commandButton value="Cancel" action="{!cancel}"/> </td>
+            </tr>
+        </table>
+    </apex:form>
+</apex:page>
