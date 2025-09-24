@@ -1,0 +1,42 @@
+name: Salesforce Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Allows manual trigger from GitHub UI or via MCP
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      - name: Install Salesforce CLI
+        run: npm install sfdx-cli --global
+
+      - name: Authenticate to Salesforce Dev Org
+        env:
+          SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL }}
+        run: sfdx auth:sfdxurl:store -f <(echo $SFDX_AUTH_URL) -a DevOrg
+
+      - name: Deploy to Salesforce
+        run: sfdx force:source:deploy -p force-app --target-org DevOrg --wait 10 --json
+
+      - name: Run Apex Tests
+        run: sfdx force:apex:test:run --target-org DevOrg --wait 10 --resultformat human
+
+      - name: Check Deployment Status and Fail if Needed
+        run: |
+          DEPLOY_STATUS=$(sfdx force:source:deploy:report --target-org DevOrg --wait 10 --json | jq -r '.result.status')
+          if [ "$DEPLOY_STATUS" != "Succeeded" ]; then
+            echo "Deployment failed"
+            exit 1
+          fi

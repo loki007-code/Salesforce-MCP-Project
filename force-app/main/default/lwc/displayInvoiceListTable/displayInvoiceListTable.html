@@ -1,0 +1,109 @@
+<template>
+    <template if:true={showInvoice}>
+        <lightning-card title="Invoice List" icon-name="standard:account"> </lightning-card>
+        <div class="slds-align_absolute-center">
+            <lightning-datatable key-field="id" columns={columns} show-row-number-column="true" hide-checkbox-column="true" data={paginatedData} onrowaction={handleRowAction}
+                sorted-by={sortBy} sorted-direction={sortDirection} onsort={doSorting} ></lightning-datatable>
+        </div>
+        <div class="slds-m-top_medium slds-align_absolute-center">
+            <lightning-button label="Previous" onclick={goToPreviousPage} class="slds-m-left_x-small"
+                disabled={isFirstPage}></lightning-button>
+            <span class="slds-m-horizontal_small"> Page {page} of {totalPages} </span>
+            <lightning-button label="Next" onclick={goToNextPage} class="slds-m-right_x-small"
+                disabled={isLastPage}></lightning-button>
+        </div>
+    </template>
+
+    <template if:true={showInvoiceLine}>
+        <lightning-card title="Show Invoice Record" icon-name="standard:account">
+            <div slot="actions">
+                <lightning-button variant="brand" label="Back" onclick={handleBack}></lightning-button>
+                <lightning-button variant="success" label="Add Products" title="Successful action" onclick={handleClick}
+                    class="slds-m-left_x-small"></lightning-button>  
+            </div>
+            <div class="slds-p-around_medium">
+                <div class="slds-grid slds-wrap">
+                    <div class="slds-col slds-size_2-of-12">
+                        <p><strong>Invoice Number: </strong> <lightning-formatted-text class="link" value={selectedInvoice.Name} 
+                            data-id={selectedInvoice.Id} data-type="invoice" onclick={handleRecordClick}></lightning-formatted-text> </p>
+                    </div>
+                    <div class="slds-col slds-size_2-of-12">
+                        <p><strong>Invoice Date: </strong> {selectedInvoice.Invoice_Date__c}</p>
+                    </div>
+                    <div class="slds-col slds-size_2-of-12">
+                        <p><strong>Buyer Name: </strong> <lightning-formatted-text class="link" value={selectedInvoice.Buyer_Name__c} data-id={selectedInvoice.BuyerId}
+                            data-type="buyer" onclick={handleRecordClick}></lightning-formatted-text> </p>
+                    </div>
+                    <div class="slds-col slds-size_2-of-12">
+                        <p><strong>Invoice Status: </strong> {selectedInvoice.Invoice_Status__c}</p>
+                    </div>
+                    <div class="slds-col slds-size_2-of-12">
+                        <p><strong>Seller Name: </strong> <lightning-formatted-text class="link" value={selectedInvoice.Seller_Name__c} data-id={selectedInvoice.SellerId} 
+                            data-type="seller" onclick={handleRecordClick}></lightning-formatted-text> </p>
+                    </div>
+                    <div class="slds-col slds-size_2-of-12">
+                        <p><strong>Pending Amount: </strong> {selectedInvoice.Pending_Amount__c}</p>
+                    </div>
+                </div>
+            </div>
+        </lightning-card>
+
+        <template if:true={invoiceLineData}>
+            <div class="slds-m-top_large"></div>
+            <lightning-card title="Show Invoice Line Record" icon-name="standard:account">
+                <lightning-datatable key-field="id" columns={invoiceLineColumns} data={paginatedInvoiceLineData} show-row-number-column="true" hide-checkbox-column="true"
+                    sorted-by={invoiceLineSortBy} sorted-direction={invoiceLineSortDirection} onsort={doInvoiceLineSorting}>
+                </lightning-datatable>
+                <div class="slds-m-top_medium slds-align_absolute-center">
+                    <lightning-button label="Previous" onclick={goToInvoiceLinePreviousPage} class="slds-m-left_x-small"
+                        disabled={isInvoiceLineFirstPage}></lightning-button>
+                    <span class="slds-m-horizontal_small"> Page {invoiceLinePage} of {invoiceLineTotalPages} </span>
+                    <lightning-button label="Next" onclick={goToInvoiceLineNextPage} class="slds-m-right_x-small"
+                        disabled={isInvoiceLineLastPage}></lightning-button>
+                </div>
+            </lightning-card>
+        </template>
+
+        <template if:false={invoiceLineData}>
+            <div class="slds-m-top_large"></div>
+            <lightning-card title="Show Invoice Line Record" icon-name="standard:account">
+                <p> No Invoice Lines for this Invoice</p>
+            </lightning-card>
+        </template>
+    </template>
+
+    <template if:true={showAddProduct}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium">Add Product</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium">
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox name="productName" label="Product Name" value={productName} options={productOptions} onchange={handleInputChange}> </lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input type="number" name="quantity" label="Quantity" value={quantity} onchange={handleInputChange}></lightning-input>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input type="number" name="price" label="Price" value={price} onchange={handleInputChange}></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input type="number" name="taxes" label="Taxes" value={taxes} onchange={handleInputChange}></lightning-input>
+                        </div>
+                    </div>    
+                </div>
+                <footer class="slds-modal__footer">
+                    <div class="slds-grid slds-grid_align-center slds-gutters">
+                        <lightning-button variant="brand" label="Save" onclick={handleSave}></lightning-button>
+                        <lightning-button variant="neutral" class="slds-m-left_small"  label="Cancel" onclick={handleCancel}></lightning-button>
+                    </div>
+                </footer>                
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>
