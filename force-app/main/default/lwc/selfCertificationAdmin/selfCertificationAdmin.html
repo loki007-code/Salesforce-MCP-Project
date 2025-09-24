@@ -1,0 +1,58 @@
+<template>
+    <lightning-card title="Self Certification Admin Records" icon-name="standard:record">
+        <div class="slds-p-around_small">
+            <div class="slds-grid slds-gutters_small">
+                <div class="slds-col slds-size_3-of-12">
+                    <lightning-input type="search" label="" placeholder="Search by Country" variant="label-hidden"
+                        onchange={handleCountrySearch}></lightning-input>
+                </div>
+                <div class="slds-col slds-size_3-of-12">
+                    <lightning-input type="search" label="" placeholder="Search by User" variant="label-hidden"
+                        onchange={handleCertifiedBySearch}></lightning-input>
+                </div>
+                <!-- <div class="slds-col slds-size_3-of-12">
+                    <lightning-input type="search" label="" placeholder="Search by Status" variant="label-hidden"
+                        onchange={handleStatusSearch}></lightning-input>
+                </div> -->
+                <div class="slds-col slds-size_3-of-12">
+                    <lightning-combobox label="" value={statusSearch} options={statusOptions} placeholder="Search by Status" variant="label-hidden"
+                        onchange={handleStatusChange}>
+                    </lightning-combobox>
+                </div>
+                <!-- <div class="slds-col slds-grow-none slds-align-end">
+                    <lightning-button variant="neutral" label="Export CSV" onclick={exportCSV}></lightning-button>
+                </div> -->
+            </div>
+        </div>
+
+        <div class="slds-p-around_small">
+            <template if:true={paginatedData}>
+                <div class="slds-align_absolute-center">
+                    <lightning-datatable key-field="id" data={paginatedData} columns={columns} hide-checkbox-column
+                        show-row-number-column class="slds-m-top_small">
+                    </lightning-datatable>
+                </div>
+            </template>
+            <template if:false={paginatedData}>
+                <p class="slds-text-color_weak slds-m-top_medium">No records to display.</p>
+            </template>
+        </div>
+
+
+        <lightning-layout horizontal-align="center" class="slds-m-top_medium">
+            <lightning-layout-item padding="horizontal-small">
+                <lightning-button label="Previous" onclick={goToPreviousPage} class="slds-m-right_x-small"
+                    disabled={isFirstPage}> </lightning-button>
+            </lightning-layout-item>
+            <lightning-layout-item padding="horizontal-small" class="slds-align-middle">
+                <span>Page {page} of {totalPages}</span>
+            </lightning-layout-item>
+            <lightning-layout-item padding="horizontal-small">
+                <lightning-button label="Next" onclick={goToNextPage} class="slds-m-left_x-small"
+                    disabled={isLastPage}></lightning-button>
+            </lightning-layout-item>
+            </lightning-layout>
+    </lightning-card>
+
+    
+</template>
