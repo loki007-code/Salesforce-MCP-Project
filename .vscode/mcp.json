@@ -1,0 +1,40 @@
+{
+
+  "inputs": [
+    {
+      "id": "github_pat",
+      "description": "GitHub personal access token",
+      "type": "promptString",
+      "password": true
+    }
+  ],
+
+	"servers": {
+		"Salesforce DX": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@salesforce/mcp",
+				"--orgs",
+				"DEFAULT_TARGET_ORG",
+				"--toolsets",
+				"all"
+			]
+		},
+
+    "github": {
+      "type": "stdio",
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm", "-e", "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "ghcr.io/github/github-mcp-server"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${input:github_pat}"
+      }
+    }
+  
+	}
+
+}
